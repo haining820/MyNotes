@@ -461,6 +461,8 @@ sleep 方法的参数指定当前线程阻塞的毫秒数：1000ms = 1ms
 sleep (1000);
 ```
 
+- 线程在 sleep 的时候处于 TIMED_WAITING 状态；
+- 在被打断的时候会抛出 InterruptedException
 - sleep 存在异常 InterruptedException；
 - sleep 时间达到后线程进入就绪状态；
 - sleep 可以模拟网络延时（买票），倒计时等；
@@ -470,7 +472,7 @@ sleep (1000);
 
 > https://juejin.cn/post/7067782161012621319
 
-sleep 方法和 wait 方法都是用来将线程进入休眠状态的，并且 sleep 和 wait 方法都可以响应 interrupt 中断，也就是线程在休眠的过程中，如果收到中断信号，都可以进行响应并中断，且都可以抛出 InterruptedException 异常。
+sleep 方法和 wait 方法都会使线程进入休眠状态，在休眠的过程中可以响应 interrupt 中断信号，抛出 InterruptedException 异常。
 
 - 来自不同的类：
   - `wait()` 是 Object 类中的方法；
@@ -494,6 +496,42 @@ sleep 方法和 wait 方法都是用来将线程进入休眠状态的，并且 s
 - 线程进入状态不同
 
   调用 sleep 方法线程会进入 `TIMED_WAITING` 有时限等待状态，而调用无参数的 wait 方法，线程会进入 `WAITING` 无时限等待状态。
+
+<font size=4 style="font-weight:bold;background:yellow;">InterruptedException</font>
+
+<font color='red' style="font-weight:bold;">在什么情况下，线程会抛出 InterruptedException？</font>
+
+**InterruptedException 注释**
+
+```java
+// 线程正在
+// wait()或sleep() -> TIMED_WAITING 
+// 或处于其他状态被中断时 -> BLOCKED、WAITING
+Thrown when a thread is waiting, sleeping, or otherwise occupied, 
+// 或者在活动之前或者活动的过程中 -> 从这三种状态转换为RUNNABLE状态
+// 会抛出InterruptedException 
+and the thread is interrupted, either before or during the activity. 
+// 探测当前线程是否被中断
+Occasionally a method may wish to test whether the current thread has been interrupted, 
+and if so, to immediately throw this exception. The following code can be used to achieve this effect:
+if (Thread.interrupted())  // Clears interrupted status!
+    throw new InterruptedException();
+```
+
+当线程处于 **BLOCKED**、**WAITING**、**TIMED_WAITING** 状态或者**处于从这3种状态转换为 RUNNABLE 状态**的过程中如果被中断，则会抛出 InterruptedException。
+
+<font color='red' style="font-weight:bold;">如果线程没有睡眠，调用该线程的 interrupt 方法会怎样？</font>
+
+线程只有处于不活跃状态的情况下被中断才会抛出 InterruptedException，InterruptedException 只是中断在线程处于非活跃状态下的表现形式。
+
+中断本身跟线程是否在活跃状态没有关系，线程在不活跃状态下遇到中断会抛出异常的原因是如果不抛出异常的话就回不到正常运行状态处理中断。如果线程本身就是活跃状态，调用 interrupt 方法就会被忽视掉并且继续运行原来的任务。
+
+<font color='#924193' style="font-weight:bold;">TODO：`interrupt`、`interrupted`、`isInterrupted` 的区别？</font> [B站视频](https://www.bilibili.com/video/BV1CM4y157vc/?spm_id_from=pageDriver&vd_source=41d80bc4b64d14c77cf954da5d0d2841) 最后的部分继续看
+
+如果想要处理这种活跃状态下的中断，首先线程需要知道自己的中断状态：
+
+- `isInterrupted`：查看线程是否处于中断状态
+- `interrupted`：查看中断状态，并且将线程处于中断状态
 
 ## 4.3、yield
 
@@ -601,7 +639,6 @@ public class TestState {
     TIMED_WAITING
     TIMED_WAITING
     ...
-    TIMED_WAITING
     TIMED_WAITING
     ////////////
     TERMINATED		// 死亡之后的线程就不能再次启动了

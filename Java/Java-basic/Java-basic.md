@@ -1,5 +1,5 @@
 ---
-title: java基础
+title: Java基础
 date: 2022-08-14
 tags: [Java]
 toc: true
@@ -29,7 +29,7 @@ exit			# 退出dos
 
 ## 1.2、JDK
 
-==**JVM、JDK 与 JRE**==
+<font size=4 style="font-weight:bold;background:yellow;">JVM、JDK 与 JRE</font>
 
 - JVM（Java Virtual Machine）
 
@@ -51,20 +51,22 @@ exit			# 退出dos
 
 
 
-一个 Java 程序运行的过程
+## 1.3、一个 Java 程序运行的过程
+
+> https://www.cnblogs.com/javastack/p/13397621.html
 
 ```java
 Java 源程序 -> 编译器 -> Java 字节码文件 -> JVM 运行(字节码文件) 
          javac.exe:编译器				   java.exe:解释器
 ```
 
-新建 HelloWorld.java 文件
+新建 `HelloWorld.java` 文件
 
 ```java
-public class HelloWorld		// 类的名称，必须和文件名完全一样
-{
-    public static void main(String[] args)	// 程序的起点
-    {
+// 类的名称必须和文件名完全一样
+public class HelloWorld {
+    // 程序的起点
+    public static void main(String[] args) {
         System.out.println("Hello,World!")	// 默认换行，不换行去掉ln
     }
 }
@@ -74,7 +76,7 @@ public class HelloWorld		// 类的名称，必须和文件名完全一样
 
   ```bash
   javac HelloWorld.java	# 编译，生成HelloWorld.class
-  java HelloWorld			# 无.class，运行程序，如果程序内容更改了需要用javac重新编译
+  java HelloWorld			# 无.class后缀，运行程序，如果程序内容更改了需要用javac重新编译
   ```
 
 - 命名规范
@@ -83,7 +85,25 @@ public class HelloWorld		// 类的名称，必须和文件名完全一样
 
   变量名/方法名：首字母小写，后面每个单词首字母大写。（小驼峰式）
 
+<font size=4 style="font-weight:bold;background:yellow;">编译期</font>
 
+**compile：**通过编译器进行<font color='#0000ff' style="font-weight:bold;">编译</font>，其中有各种校验解析步骤，把源代码编译成了可被虚拟机执行的字节码， `Java源码 -> Java字节码`
+
+这个编译器是 jdk 里的 javac 编译器， `javac HelloWorld.java` 编译该源码，javac 编译器位置：`jdk\bin\javac.exe`
+
+<font size=4 style="font-weight:bold;background:yellow;">运行期</font>
+
+**load and execute：**<font color='#0000ff' style="font-weight:bold;">加载 Java 字节码并执行</font>
+
+通过 jdk 里的java命令运行 Java 字节码，`java HelloWorld` 加载并执行该字节码，当运行 java 命令时，JRE 将与您指定的类一起加载。然后执行该类的主要方法，java 命令位置：`jdk\bin\java.exe`
+
+Java 提供类加载器把虚拟机外部的字节码资源载入到**虚拟机的运行时环境（主要是指虚拟机的方法区）**并提供字节码验证器来保证载入的字节码是安全合法的，对程序没有危害的。
+
+**加载器 (Class Loader)：**当字节码还没被类加载器加载之前它目前还处于虚拟机外部存储空间里，要想执行它需要通过类加载器来加载到虚拟机的运行时内存空间里，常见的类加载器：
+
+- Bootstrap ClassLoader（启动类加载器）：加载位于 `<JAVA_HOME>\lib` 目录下的类文件，如 `rt.jar`；
+- Extension ClassLoader（扩展类加载器）： 加载位于 `<JAVA_HOME>\lib\ext` 目录下的类文件；
+- Application ClassLoader（应用程序类加载器）：加载位于类路径（ClassPath）下的类文件（这部分可参考[注解与反射](https://haining820.github.io/2022/08/14/mynotes/Java/annotation-reflex/annotation-reflex/)）
 
 # 2、变量
 
@@ -1056,21 +1076,51 @@ public class Demo01String {
 # 8、异常
 
 > 异常，就是不正常的意思。在生活中医生说，你的身体某个部位有异常，该部位和正常相比有点不同，该部位的功能将受影响。在程序中的意思也类似，异常指的并不是语法错误，语法错了，编译不通过，不会产生字节码文件，根本不能运行。
+>
+> https://blog.csdn.net/hguisu/article/details/6155636
 
-**==什么是异常？==**
+**什么是异常？**
 
 异常：指的是程序在执行过程中，出现的非正常的情况，最终会导致 JVM 的非正常停止。在 Java 等面向对象的编程语言中，异常本身是一个类，产生异常就是创建异常对象并抛出了一个异常对象，Java 处理异常的方式是中断处理。
 
-**==异常体系==**
+**异常体系**
 
-异常机制其实是帮助我们找到程序中的问题，异常的根类是 `java.lang.Throwable`，其下有两个子类：`java.lang.Error` 与 **`java.lang.Exception`**，平常所说的异常指 **`java.lang.Exception`**。
+异常机制其实是帮助我们找到程序中的问题，异常的根类是 `java.lang.Throwable`，其下有两个子类：`java.lang.Error` 与 `java.lang.Exception`，平常所说的异常指 `java.lang.Exception`。
 
-**Throwable 体系**
+<img src="https://haining820-bucket.oss-cn-beijing.aliyuncs.com/typora_img/%E5%BC%82%E5%B8%B8%E4%BD%93%E7%B3%BB.jpg" alt="异常体系" style="zoom:80%;" />
+
+- Error：严重问题，不需要处理；
+
+- Exception：异常类，程序本身可以处理的问题：
+
+  - RuntimeException：都是 RuntimeException 类及其子类异常，如 NullPointerException（空指针异常）、IndexOutOfBoundsException（下标越界异常）等，这些异常是不检查异常，程序中可以选择捕获处理，也可以不处理。这些异常一般是由程序逻辑错误引起的，程序应该从逻辑角度尽可能避免这类异常的发生。
+
+    运行时异常的特点是Java编译器不会检查它，也就是说，当程序中可能出现这类异常，即使没有用try-catch语句捕获它，也没有用throws子句声明抛出它，也会编译通过。
+
+  - 非 RuntimeException：这种异常的特点是 Java 编译器会检查它，也就是说，当程序中可能出现这类异常，要么用 try-catch 捕获它，要么用 throws 抛出它，否则编译不会通过。
+
+<font size=4 style="font-weight:bold;background:yellow;">Throwable 体系</font>
 
 **`java.lang.Throwable`** 类是 Java 语言中所有错误或异常的父类。
 
 - Exception：表示异常，异常产生后程序员可以通过代码的方式纠正，使程序继续运行，是必须要处理的。好比感冒、阑尾炎。
 
+  - 运行期异常，Java 程序运行过程中出现的问题。在写代码时不会被发现。
+
+    ```java
+    public class Demo01Exception {
+        public static void main(String[] args) {
+            int[] arr = {1, 2, 3};
+            try {
+                // ArrayIndexOutOfBoundsException extends IndexOutOfBoundsException extends RuntimeException extends Exception
+                System.out.println(arr[3]); // 可能会出现异常的代码
+            } catch (Exception e) {
+                System.out.println(e); 		// 异常的处理逻辑
+            }
+        }
+    }
+    ```
+    
   - 编译期异常，在编写代码时就会发现问题。处理方法：`try-catch` 或者 `throws`
 
     ```java
@@ -1090,22 +1140,6 @@ public class Demo01String {
     }
     ```
 
-  - 运行期异常，Java 程序运行过程中出现的问题。在写代码时不会被发现。
-
-    ```java
-    public class Demo01Exception {
-        public static void main(String[] args) {
-            int[] arr = {1, 2, 3};
-            try {
-                // ArrayIndexOutOfBoundsException extends IndexOutOfBoundsException extends RuntimeException extends Exception
-                System.out.println(arr[3]); // 可能会出现异常的代码
-            } catch (Exception e) {
-                System.out.println(e); 		// 异常的处理逻辑
-            }
-        }
-    }
-    ```
-
 - Error：严重错误 Error，无法通过处理的错误，只能事先避免，好比绝症。 
 
   以下这段代码会产生内存溢出的错误，创建的数组太大了，超出了给 JVM 分配的内存，必须修改代码，使创建的数组小一点。
@@ -1115,15 +1149,15 @@ public class Demo01String {
   int[] arr = new int[1024*1024];			// ✔
   ```
 
-**==异常的产生过程==**
+异常的产生过程
 
 ![image-20220113223214603](Java-basic/image-20220113223214603.png)
 
-**==异常的处理==**
+## 8.1、异常的处理
 
 Java 异常处理的五个关键字：**try、catch、finally、throw、throws**
 
-**throw关键字**
+<font size=4 style="font-weight:bold;background:yellow;">throw关键字</font>
 
 可以使用 throw 关键字在指定的方法中抛出指定的异常
 

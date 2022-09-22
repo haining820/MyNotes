@@ -360,8 +360,6 @@ Integer integer = future.get();
 
 `get()` 方法同样会阻塞直到任务完成，上面的代码，主线程会一直阻塞，因为这种方式创建的 future 从未完成，可以打个断点看看，状态一直是 not completed。
 
-![image-20220722143333094](future/image-20220722143333094.png)
-
 `get(long timeout, TimeUnit unit)`：可以指定超时时间，当到了指定的时间还未获取到任务，就会抛出 TimeoutException 异常。
 
 `getNow(T valueIfAbsent)`：获取任务的执行结果，但不会产生阻塞。如果任务还没执行完成，那么就会返回传入的 `valueIfAbsent` 参数值，如果执行完成了，就会返回任务执行的结果。
