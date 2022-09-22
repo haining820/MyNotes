@@ -5,6 +5,8 @@ tags: [maven]
 toc: true
 ---
 
+> https://blog.csdn.net/weixin_38569499/article/details/91456988
+
 # 1、project
 
 project 是 pom 文件的根元素，project 下有 modelVersion、groupId、artifactId、version、packaging 等重要元素，使用 groupId、artifactId、version 三个元素定义一个项目。
@@ -18,7 +20,10 @@ project 是 pom 文件的根元素，project 下有 modelVersion、groupId、art
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+</project>
 ```
+
+`project`：根元素；
 
 `xmlns`：命名空间，类似包名
 `xmlns:xsi`：xml 遵循的标签规范
@@ -64,6 +69,8 @@ project 是 pom 文件的根元素，project 下有 modelVersion、groupId、art
 
 # 2、parent
 
+父项目的坐标，坐标包括 groupId，artifactId 和 version，如果项目中没有规定某个元素的值，那么父项目中的对应值即为项目的默认值。
+
 ```xml
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -81,8 +88,8 @@ project 是 pom 文件的根元素，project 下有 modelVersion、groupId、art
 
 `relativePath`：
 
-- 指定查找该父项目pom.xml的(相对)路径。默认顺序：relativePath > 本地仓库 > 远程仓库；
-- 没有relativePath标签等同…/pom.xml，即默认从当前 pom 文件的上一级目录找，表示不从 relativePath 找，直接从本地仓库找，找不到再从远程仓库找。
+- 指定查找该父项目 pom.xml 的(相对)路径。默认顺序：构建当前项目的地方 > relativePath > 本地仓库 > 远程仓库；
+- 没有 relativePath 标签等同 `../pom.xml`，即默认从当前 pom 文件的上一级目录找，表示不从 relativePath 找，直接从本地仓库找，找不到再从远程仓库找。
 
 # 3、properties
 
@@ -114,22 +121,20 @@ project 是 pom 文件的根元素，project 下有 modelVersion、groupId、art
 
 dependencyManagement 元素提供了一种管理依赖版本号的方式。在 dependencyManagement 元素中声明所依赖的 jar 包的版本号等信息，那么所有子项目再次引入此依赖 jar 包时则无需显式的列出版本号。**Maven 会沿着父子层级向上寻找拥有 dependencyManagement 元素的项目，然后使用它指定的版本号。**
 
-- pom 中在该标签下声明依赖只起到一个<font color='red' style="font-weight:bold;">声明</font>的作用，实际上并<font color='red' style="font-weight:bold;">不会真实导入</font>；
+- pom 中在该标签下声明依赖**只起到一个声明的作用，实际上并不会真实导入；**
 
-- <font color='red' style="font-weight:bold;">当子模块 pom 需要引入对应依赖时，只需声明对应的 groupId 和 artifactId 即可，省略掉的 version 和 scope，会沿着树向上层 pom 查找最近的 dependencyManagement 声明的 groupId 和 artifactId，并使用其声明的 version 和 scope。</font>
+- 当子模块 pom 需要引入对应依赖时，只需声明对应的 groupId 和 artifactId 即可，省略掉的 version 和 scope，会沿着树向上层 pom 查找最近的 dependencyManagement 声明的 groupId 和 artifactId，并使用其声明的 version 和 scope；
 
-  如果有多个子项目都引用同一样依赖，可以避免在每个使用的子项目里都声明一个版本号。当想升级或切换到另一个版本时，只需要在顶层父容器里更新，而不需要逐个修改子项目。
+  如果有多个子项目都引用同一样依赖，可以避免在每个使用的子项目里都声明一个版本号。当想升级或切换到另一个版本时，只需要在顶层父容器里更新，不需要逐个修改子项目；
 
-- 如果某个子项目需要另外的一个版本，也可以声明 version 和 scope， 覆盖父级继承的配置，<font color='red' style="font-weight:bold;">dependencies 优先级高于 dependencyManagement</font>。
+- 如果某个子项目需要另外的一个版本，也可以声明 version 和 scope， **覆盖父级继承的配置 dependencies 优先级高于 dependencyManagement；**
 
-- <font color='red' style="font-weight:bold;">父 pom 中的 dependencyManagement 允许被子模块的 dependencyManagement 覆盖。</font>
+- 父 pom 中的 dependencyManagement 允许被子模块的 dependencyManagement 覆盖。
 
 ```xml
-    <!-- 继承自该项目的所有子项目的默认依赖信息，这部分的依赖信息不会被立即解析。 -->
-    <!-- 当子项目声明一个依赖，如果group ID和artifact ID以外的一些信息没有描述，则使用这里的依赖信息 -->
     <dependencyManagement>
         <dependencies>
-            <!--参见dependencies/dependency元素 -->
+            <!--参考dependencies/dependency元素 -->
             <dependency>
                 ......
             </dependency>
@@ -139,23 +144,21 @@ dependencyManagement 元素提供了一种管理依赖版本号的方式。在 d
 
 # 5、dependencies 标签
 
-<font size=4 style="font-weight:bold;background:yellow;">dependencies</font>
-
 - pom 文件中通过 dependencyManagement 来声明依赖，通过 dependencies 元素来管理依赖。
 
 - dependencies 子元素的配置和 dependencyManagement 下的 dependencices 相同；
 
 - 而 dependencies 下只有一类直接的子元素：dependency，一个 dependency 子元素表示一个依赖项目。
 
-## 5.1、依赖坐标
+<font size=4 style="font-weight:bold;background:yellow;">依赖坐标</font>
 
-**groupId/artifactId/version：**依赖项目的坐标三元素
+groupId/artifactId/version：依赖项目的坐标三元素，一个 maven 仓库中，完全相同的一组 groupId、artifactId、version，只能有一个项目。
 
-<font size=4 style="font-weight:bold;background:yellow;">依赖范围</font>
+**依赖范围**
 
 provided：在运行期外部已经提供了，所以在运行时就不需要
 
-可能会与依赖包有一些交互，speing 接口controller拿到请求获取对象，httpservletresponse、httpservletrequest，但是要导入servlet，写的时候要引进来但是在编译期不需要，运行时候不需要这个
+可能会与依赖包有一些交互，spring 接口controller拿到请求获取对象，httpservletresponse、httpservletrequest，但是要导入servlet，写的时候要引进来但是在编译期不需要，运行时候不需要这个
 
 jdbc驱动：写的时候不需要，但是运行时需要
 
