@@ -134,7 +134,7 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 
 <font size=4 style="font-weight:bold;background:yellow;">Demo</font>
 
-{% spoiler展开查看折叠代码 %}
+{% spoiler 展开查看折叠代码 %}
 
 ```java
 public class Demo01 {
