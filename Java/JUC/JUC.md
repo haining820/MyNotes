@@ -1267,88 +1267,7 @@ public class SynchronousDemo {
  */
 ```
 
-# 8、四大函数式接口
 
-> 新时代程序员：lambda 表达式、链式编程、函数式接口、Stream 流式计算
-
-**函数式接口：**只有一个方法的接口（如 Runnable 接口），**只要是函数式接口，就可以用 lambda 表达式简化。**
-
-```java
-@FunctionalInterface
-public interface Runnable {
-    public abstract void run();
-}
-```
-
-## 8.1、Function
-
-**Function：函数型接口，有一个输入参数，有一个输出参数。**
-
-```java
-@FunctionalInterface	// 部分源码
-public interface Function<T, R> {
-    R apply(T t);	// 传入类型T，返回类型R
-}
-```
-
-测试：输入一个字符串，返回相同的字符串。
-
-```java
-package com.haining820.function;
-import java.util.function.Function;
-
-public class Demo01 {
-    public static void main(String[] args) {
-        Function<String, String> function = new Function<String, String>() {
-            @Override
-            public String apply(String str) {
-                return str;
-            }
-        };	// 工具类：返回输入的字符串
-        System.out.println(function.apply("yhn666"));
-        
-        Function<String, String> function1 = (str) -> {
-            return str;
-        };
-        System.out.println(function1.apply("777"));
-    }
-}
-```
-
-## 8.2、Predicate
-
-**Predicate：断定型接口，只有一个输入参数，返回值只能是 boolean 值。**
-
-```java
-@FunctionalInterface
-public interface Predicate<T> {
-    boolean test(T t);	// 传入类型T，返回类型boolean
-}
-```
-
-测试：输入一个字符串，判断该字符串是否为空。
-
-```java
-package com.haining820.function;
-import java.util.function.Predicate;
-
-public class Demo02 {
-    public static void main(String[] args) {
-        Predicate<String> predicate = new Predicate<String>() {
-            @Override
-            public boolean test(String s) {
-                return s.isEmpty();
-            }
-        };  // 工具类：判断字符串是否为空
-        System.out.println(predicate.test(""));
-
-        Predicate<String> predicate1=(str)->{
-            return str.isEmpty();
-        };
-        System.out.println(predicate1.test(""));
-    }
-}
-```
 
 ## 8.3、Consumer
 
@@ -1421,7 +1340,7 @@ public class Demo04 {
 }
 ```
 
-**注意：泛型如果不进行特别指定会默认为 Object，注意要与函数式接口的传入返回类型相匹配。**
+**注意：
 
 # 9、Stream 流式计算
 
