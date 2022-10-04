@@ -19,6 +19,8 @@ public interface Runnable {
 
 对于函数式接口，可以通过 lambda 表达式来创建该接口的对象，避免匿名内部类定义过多，可以让代码更简洁的一种表示方法。
 
+<!--more-->
+
 # 2、lambda 表达式（JDK 8）
 
 **使用 lambda 表达式简化一个函数式接口对象的过程：**<font color='red' style="font-weight:bold;">普通实现类 -> 静态内部类 -> 局部内部类 -> 匿名内部类 -> lambda表达式</font>
