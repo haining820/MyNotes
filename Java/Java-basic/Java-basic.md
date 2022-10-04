@@ -1383,13 +1383,42 @@ Math.PI		// 代表近似的圆周率常量（double）
 
 
 
-## 泛型
+# 10、泛型
 
 > https://blog.csdn.net/weixin_42071874/article/details/82993262
 
 方法的泛型优先级高于类的泛型
 
 ![泛型](D:\imgs\tempnote\泛型.png)
+
+
+
+```java
+public class TDemo {
+    public static void main(String[] args) {
+        Show<String> show = new Show<String>();
+//        show.print1(new Integer(1));    // 不能编译
+        show.print1("1");
+        show.print2(new Integer(1));    // 可以编译
+    }
+}
+
+class Show<T> {
+    /**
+     * 该方法的参数类型必须和Demo的泛型类型相同
+     */
+    public void print1(T t) {
+        System.out.println(t);
+    }
+
+    /**
+     * <T>表示自定义泛型T，可以传入任何类型的参数
+     */
+    public <T> void print2(T t) {
+        System.out.println(t);
+    }
+}
+```
 
 
 
