@@ -1,5 +1,5 @@
 ---
-title: java源码
+title: Java集合
 date: 2022-08-14
 tags: [Java,源码]
 toc: true
@@ -410,28 +410,32 @@ n = n + 1			0000 1111 -> n = n + 1 = 0001 0000  (16)	// 最终结果为16
 
 ## 4、put 方法
 
-- 首先来看 put 函数部分的源码，调用的是 putval 函数。
+**首先来看 put 函数部分的源码，调用的是 putval 函数。**
 
-> 该部分源码的注释：Associates the specified value with the specified key in this map. If the map previously contained a mapping for the key, the oldvalue is replaced.（将指定值与此映射中的指定键相关联。如果映射以前包含该键的映射，则会替换旧值。）
->
-> ```java
-> public class Test {
->     public static void main(String[] args) {
->         Map<String,Object> map = new HashMap<>();
->         map.put("key1",111);
->         map.put("key2",222);
->         map.put("key3",333);
->         System.out.println(map.toString());
->         map.put("key1","aaa");
->         System.out.println(map.toString());
->     }
-> }
-> /*
-> 运行结果：
-> 	{key1=111, key2=222, key3=333}
-> 	{key1=aaa, key2=222, key3=333}
-> */
-> ```
+该部分源码的注释：将指定值与此映射中的指定键相关联。如果映射以前包含该键的映射，则会替换旧值。
+
+```
+Associates the specified value with the specified key in this map. If the map previously contained a mapping for the key, the oldvalue is replaced.      
+```
+
+```java
+public class Test {
+ public static void main(String[] args) {
+     Map<String,Object> map = new HashMap<>();
+     map.put("key1",111);
+     map.put("key2",222);
+     map.put("key3",333);
+     System.out.println(map.toString());
+     map.put("key1","aaa");
+     System.out.println(map.toString());
+ }
+}
+/*
+运行结果：
+	{key1=111, key2=222, key3=333}
+	{key1=aaa, key2=222, key3=333}
+*/ 
+```
 
 将这个 key 的 hash 值，这个 key 本身，还有 value 作为参数传入到 putVal 方法中。
 
@@ -499,11 +503,15 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 }
 ```
 
+## 5、putIfAbsent
 
+> https://www.runoob.com/java/java-hashmap-putifabsent.html
 
+putIfAbsent 方法会先判断指定的 key 是否存在，不存在则将键/值对插入到 HashMap 中。
 
+如果所指定的 key 已经在 HashMap 中存在，返回和这个 key 值对应的 value, 如果所指定的 key 不在 HashMap 中存在，则返回 null。
 
-
+**注意：**如果指定 key 之前已经和一个 null 值相关联了 ，则该方法也返回 null。
 
 # 常见面试题
 
@@ -570,118 +578,6 @@ HashMap（JDK 1.2）几乎可以等价于 Hashtable（一开始就有），HashM
   - HashMap 为了提高计算效率，将哈希表的大小固定为了2的幂，这样在取模预算时，不需要做除法，只需要做位运算。位运算比除法的效率要高很多。HashMap 的效率虽然提高了，但是 hash 冲突却也增加了。因为它得出的 hash 值的低位相同的概率比较高，为了解决这个问题，HashMap 重新根据 hashcode 计算 hash 值后，又对 hash 值做了一些运算来打散数据。使得取得的位置更加分散，从而减少了 hash 冲突。当然为了高效，HashMap只做了一些简单的位处理。从而不至于把使用2的幂次方带来的效率提升给抵消掉。
 
 > 另一个区别是HashMap的迭代器(Iterator)是fail-fast迭代器，而Hashtable的enumerator迭代器不是fail-fast的。所以当有其它线程改变了HashMap的结构（增加或者移除元素），将会抛出ConcurrentModificationException，但迭代器本身的remove()方法移除元素则不会抛出ConcurrentModificationException异常。但这并不是一个一定发生的行为，要看JVM。这条同样也是Enumeration和Iterator的区别。
-
-
-
-
-
-
-
-# Guava
-
-Guava 是谷歌提供的一个核心 Java 类库，其中包括**新的集合类型、不可变集合、图库，以及用于并发、I/O、Hash、缓存、字符串等的实用工具。**它在谷歌中的大多数 Java 项目中被广泛使用，也被许多其他公司广泛使用，熟练掌握这些工具类可以快速解决日常开发中的一些问题。
-
-## 1、Guava 不可变类型集合
-
-## 2、Guava 中新的集合类型
-
-### 2.1、Multiset
-
-> 问题引入：现在需要统计一个 list 中每个元素出现的次数
->
-> 传统方式：定义一个 map，遍历 list，将 list 中元素的出现次数记录在 map 中，但是有了 Guava，特定的集合类可以帮助解决这个问题。
-
-MultiSet：虽然名字中带有 set，但是可以储存重复元素，可以认为是 ArrayList 和 Map 的结合体。
-
-MultiSet 是一个接口，JDK 中的各种 map 都有对应的实现。
-
-|        Map        |      Multiset      | 是否支持 null 元素 |
-| :---------------: | :----------------: | :----------------: |
-|      HashMap      |    HashMultiset    |         是         |
-|      TreeMap      |    TreeMultiset    |         是         |
-|   LinkedHashMap   | LinkedHashMultiset |         是         |
-| ConcurrentHashMap | ConcurrentMultiset |         否         |
-|   ImmutableMap    | ImmutableMultiset  |         否         |
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

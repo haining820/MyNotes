@@ -86,3 +86,115 @@ public class ImmutableMapDemo {
 Map<String, String> aNewMap = Maps.newHashMap();
 ```
 
+# 3、Arrays
+
+
+
+# 4、不可变类型集合
+
+Guava 是谷歌提供的一个核心 Java 类库，其中包括**新的集合类型、不可变集合、图库，以及用于并发、I/O、Hash、缓存、字符串等的实用工具。**它在谷歌中的大多数 Java 项目中被广泛使用，也被许多其他公司广泛使用，熟练掌握这些工具类可以快速解决日常开发中的一些问题。
+
+## 1、Guava 不可变类型集合
+
+## 2、Guava 中新的集合类型
+
+### 2.1、Multiset
+
+> 问题引入：现在需要统计一个 list 中每个元素出现的次数
+>
+> 传统方式：定义一个 map，遍历 list，将 list 中元素的出现次数记录在 map 中，但是有了 Guava，特定的集合类可以帮助解决这个问题。
+
+MultiSet：虽然名字中带有 set，但是可以储存重复元素，可以认为是 ArrayList 和 Map 的结合体。
+
+MultiSet 是一个接口，JDK 中的各种 map 都有对应的实现。
+
+|        Map        |      Multiset      | 是否支持 null 元素 |
+| :---------------: | :----------------: | :----------------: |
+|      HashMap      |    HashMultiset    |         是         |
+|      TreeMap      |    TreeMultiset    |         是         |
+|   LinkedHashMap   | LinkedHashMultiset |         是         |
+| ConcurrentHashMap | ConcurrentMultiset |         否         |
+|   ImmutableMap    | ImmutableMultiset  |         否         |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
