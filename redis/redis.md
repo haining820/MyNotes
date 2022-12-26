@@ -484,7 +484,7 @@ OK
 127.0.0.1:6379> GET key2
 "axxdefg"
 #################################################################
-# setex (set with expire)	# 设置过期事件
+# setex (set with expire)	# 设置过期时间
 127.0.0.1:6379> setex key3 30 "hello"	# 设置key3的值为hello，30秒后过期
 OK
 127.0.0.1:6379> ttl key3

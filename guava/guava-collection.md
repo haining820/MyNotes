@@ -80,10 +80,11 @@ public class ImmutableMapDemo {
 
 # 2、Maps
 
-不用 new 创建 HashMap
+不用 new 创建 HashMap，一种简便写法，不用写泛型，Lists.newArrayList 同理。
 
 ```java
-Map<String, String> aNewMap = Maps.newHashMap();
+HashMap<String, Object> map = Maps.newHashMap();
+Map<String, String> map = Maps.newHashMap();
 ```
 
 # 3、Arrays
