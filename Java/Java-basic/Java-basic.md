@@ -1391,8 +1391,6 @@ Math.PI		// 代表近似的圆周率常量（double）
 
 ![泛型](D:\imgs\tempnote\泛型.png)
 
-
-
 ```java
 public class TDemo {
     public static void main(String[] args) {
@@ -1420,49 +1418,24 @@ class Show<T> {
 }
 ```
 
+# 11、String...
 
+`String...` 是 Java5 新加入的功能，表示一个可变长度的参数列表。其语法就是类型后跟 `…`，表示此处接受的参数为 0 到多个 Object 类型的对象，或者是一个 Object 数组。
 
+例如有一个方法叫做 `test(String…strings)`，那么还可以增加方法 `test()`，但是不能写 `test(String[] strings)`（实际上跟前者是一样的），这样会造成编译错误，系统提示出现重复的方法。在使用的时候，对于 `test(String… strings)`，可以用以下几种方式 去调用：
 
+```java
+test();				 // 表示没有参数
+test("aaa");		 // 一个参数
+test("aaa"，"bbb");	// 两个参数
+test(new String[]{“aaa”,”bbb”});	// 数组
+```
 
+**tips：**
 
+- 如果既有 `test(String… strings)`，又有 `test()`，在调用 `test()` 时会优先使用 `test()` ；
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- 只有当没有 `test()` 函数时调用 `test()`，程序才会走 `test(String… strings)`。
 
 
 
