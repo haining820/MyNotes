@@ -132,7 +132,7 @@ omitEmptyString：去掉空的元素
 
 joiner，线程安全，不可变
 
-**==join()：将字符串插入==**
+**join()：将字符串插入**
 
 ![image-20220715105713112](guava/image-20220715105713112.png)
 

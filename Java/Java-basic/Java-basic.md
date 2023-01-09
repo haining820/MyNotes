@@ -1379,10 +1379,6 @@ Math.PI		// 代表近似的圆周率常量（double）
       System.out.println(Arrays.toString(arr2));  // [aaa, bbb, ccc]
   ```
 
-
-
-
-
 # 10、泛型
 
 > https://blog.csdn.net/weixin_42071874/article/details/82993262
