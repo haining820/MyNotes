@@ -133,7 +133,30 @@ public T join()
 
 # 2、supplyAsync/runAsync
 
-**功能：**执行异步任务，可以初始化 cf；
+> 在学习异步任务的编排前，首先准备打印当前时间和线程名的工具类：
+>
+> ```java
+> public class SmallTool {
+>     public static void sleepMillis(long millis) {
+>         try {
+>             Thread.sleep(millis);
+>         } catch (InterruptedException e) {
+>             e.printStackTrace();
+>         }
+>     }
+>     public static void printTimeAndThread(String tag) {
+>         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+>         String result = new StringJoiner("\t|\t")
+>                 .add(sdf.format(new Date()))
+>                 .add(String.valueOf(Thread.currentThread().getId()))
+>                 .add(Thread.currentThread().getName())
+>                 .add(tag).toString();
+>         System.out.println(result);
+>     }
+> }
+> ```
+
+**功能：**<font color='#0000ff' style="font-weight:bold;">执行异步任务，可以初始化 cf。</font>
 
 **区别：**supplyAsync 用于有返回值的任务，runAsync 用于没有返回值的任务，不需要返回值时使用 runAsync 即可。
 
@@ -146,25 +169,27 @@ public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executo
 }
 ```
 
-**关于 supplyAsync 的参数 Supplier supplier：**（详见[函数式接口](https://haining820.github.io/2022/10/04/mynotes/Java/functional-interface/)）
+**参数：**
 
-- 供应者 supplier，是一个函数式接口；
+- 供应者 supplier，是一个函数式接口；（详见[函数式接口](https://haining820.github.io/2022/10/04/mynotes/Java/functional-interface/)）
 
 - supplyAsync 后括号中的 supplier 会去另一个线程中执行。
 
 - Executor 参数可以手动指定线程池，否则默认使用 `ForkJoinPool.commonPool()` 系统级公共线程池
 
-  <font color='red' style="font-weight:bold;">注意：这些线程都是 Daemon 线程，主线程结束 Daemon 线程不结束，只有 JVM 关闭时，生命周期终止。</font>
+<font color='red' style="font-weight:bold;">注意：这些线程都是 Daemon 线程，主线程结束 Daemon 线程不结束，只有 JVM 关闭时，生命周期才终止。</font>
 
 <font size=4 style="font-weight:bold;background:yellow;">demo</font>
+
+可以看到，在小白点餐后，厨师的操作和小白后续的操作几乎是同时进行的。
 
 {% spoiler 展开查看折叠代码 %}
 
 ```java
-public class _01_supplyAsync {
     /**
      * supplyAsync 用于有返回值的任务
      */
+    @Test
     public void supplyAsyncTest(){
         SmallTool.printTimeAndThread("小白进入餐厅");
         SmallTool.printTimeAndThread("小白点了 番茄炒蛋 + 一碗米饭");
@@ -180,6 +205,7 @@ public class _01_supplyAsync {
         SmallTool.printTimeAndThread(String.format("%s ,小白开吃", cf.join()));
     }
 
+    @Test
     public void runAsyncTest(){
         SmallTool.printTimeAndThread("小白进入餐厅");
         SmallTool.printTimeAndThread("小白点了 番茄炒蛋 + 一碗米饭");
@@ -196,46 +222,36 @@ public class _01_supplyAsync {
         // cf.join()获取不到值，因为runAsync没有返回结果
         SmallTool.printTimeAndThread(String.format("%s ,小白开吃", cf.join()));
     }
-}
 ```
 
 {% endspoiler %}
 
-**supplyAsyncTest 运行结果**
+<font size=4 style="font-weight:bold;background:yellow;">res</font>
 
-```
-1663554437134	|	1	|	main	|	小白进入餐厅
-1663554437134	|	1	|	main	|	小白点了 番茄炒蛋 + 一碗米饭
-1663554437172	|	1	|	main	|	小白在打王者
-1663554437173	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师炒菜
-1663554437379	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师打饭
-1663554437490	|	1	|	main	|	番茄炒蛋 + 米饭 做好了 ,小白开吃
-```
-
-## 4.2、thenCompose
-
-在学习异步任务的编排前，首先准备打印当前时间和线程名的工具类：
+{% spoiler 展开查看折叠代码 %}
 
 ```java
-public class SmallTool {
-    public static void sleepMillis(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-    public static void printTimeAndThread(String tag) {
-        String result = new StringJoiner("\t|\t")
-                .add(String.valueOf(System.currentTimeMillis()))
-                .add(String.valueOf(Thread.currentThread().getId()))
-                .add(Thread.currentThread().getName())
-                .add(tag)
-                .toString();
-        System.out.println(result);
-    }
-}
+// supplyAsyncTest
+2023-01-15 21:31:22.878	|	1	|	main	|	小白进入餐厅
+2023-01-15 21:31:22.879	|	1	|	main	|	小白点了 番茄炒蛋 + 一碗米饭
+2023-01-15 21:31:22.916	|	1	|	main	|	小白在打王者
+2023-01-15 21:31:22.917	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师炒菜
+2023-01-15 21:31:23.122	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师打饭
+2023-01-15 21:31:23.232	|	1	|	main	|	番茄炒蛋 + 米饭 做好了 ,小白开吃
+
+// runAsyncTest
+2023-01-15 21:31:40.807	|	1	|	main	|	小白进入餐厅
+2023-01-15 21:31:40.808	|	1	|	main	|	小白点了 番茄炒蛋 + 一碗米饭
+2023-01-15 21:31:40.842	|	1	|	main	|	小白在打王者
+2023-01-15 21:31:40.842	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师炒菜
+2023-01-15 21:31:41.042	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师打饭
+2023-01-15 21:31:41.153	|	20	|	ForkJoinPool.commonPool-worker-9	|	番茄炒蛋 + 米饭 做好了
+2023-01-15 21:31:41.153	|	1	|	main	|	null ,小白开吃
 ```
+
+{% endspoiler %}
+
+## 4.2、thenCompose
 
 **thenCompose：**<font color='#0000ff' style="font-weight:bold;">连接，在异步执行线程1的基础上再开一个新的线程，使用 thenCompose 会将之前线程的结果交给下一个的线程，前一个线程运行完了有结果后下一个线程才能触发。</font>
 
@@ -245,11 +261,12 @@ public <U> CompletableFuture<U> thenCompose(Function<? super T, ? extends Comple
 }
 ```
 
-- 参数 CompletionStage：CompletableFuture 的父接口，使用 CompletableFuture 替代即可。
+**参数：**
 
-- 参数 Function：函数式接口，传入T，返回 R。
+- Function：函数式接口，传入T，返回 R。（详见[函数式接口](https://haining820.github.io/2022/10/04/mynotes/Java/functional-interface/)）
+- CompletionStage：CompletableFuture 的父接口，使用 CompletableFuture 替代即可。
 
-<font size=4 style="font-weight:bold;background:yellow;">Demo</font>
+<font size=4 style="font-weight:bold;background:yellow;">demo</font>
 
 在下面例子中入参 dish 是厨师任务的返回值，只有厨师炒菜完成后服务员才会开始打饭，然后进入第二个 CompletableFuture，再开启一个线程运行后返回，观察运行结果也可知，炒菜和打饭不在同一个线程上运行。
 
@@ -286,14 +303,19 @@ public class ThenComposeTest {
 
 **thenCombine：**<font color='#0000ff' style="font-weight:bold;">合并，将任务1和任务2一起执行，然后将任务1和任务2的返回结果用作任务3的输入。</font>
 
-下例中 dish 和 rice 作为线程 3 的输入，只有等线程 1 和线程 2 运行完毕后线程 3 才能开始运行，观察运行结果可知，线程 2 和线程 3 使用的使用同一个线程。
+<font size=4 style="font-weight:bold;background:yellow;">demo</font>
+
+demo 中 dish 和 rice 作为线程 3 的输入，只有等线程 1 和线程 2 运行完毕后线程 3 才能开始运行，观察运行结果可知，线程 2 和线程 3 使用的使用同一个线程。
+
+{% spoiler 展开查看折叠代码 %}
 
 ```java
-public class ThenCombineTest {
-    public static void main(String[] args) {
+    @Test
+    public void thenCombineTest() {
         SmallTool.printTimeAndThread("小白进入餐厅");
         SmallTool.printTimeAndThread("小白点了 番茄炒蛋 + 一碗米饭");
-        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(() -> {
+
+        CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> {
             SmallTool.printTimeAndThread("厨师炒菜");
             SmallTool.sleepMillis(200);
             return "番茄炒蛋";
@@ -307,24 +329,31 @@ public class ThenCombineTest {
             return String.format("%s + %s 好了", dish, rice);
         });
         SmallTool.printTimeAndThread("小白在打王者");
-        SmallTool.printTimeAndThread(String.format("%s ,小白开吃", cf1.join()));
+        SmallTool.printTimeAndThread(String.format("%s ,小白开吃", cf.join()));
     }
-}
 ```
 
+{% endspoiler %}
+
+<font size=4 style="font-weight:bold;background:yellow;">res</font>
+
+{% spoiler 展开查看折叠代码 %}
+
 ```
-1658370473189	|	1	|	main	|	小白进入餐厅
-1658370473189	|	1	|	main	|	小白点了 番茄炒蛋 + 一碗米饭
-1658370473263	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师炒菜
-1658370473264	|	21	|	ForkJoinPool.commonPool-worker-2	|	服务员蒸饭
-1658370473264	|	1	|	main	|	小白在打王者
-1658370473575	|	21	|	ForkJoinPool.commonPool-worker-2	|	服务员打饭
-1658370473721	|	1	|	main	|	番茄炒蛋 + 米饭 好了 ,小白开吃
+2023-01-15 21:40:46.514	|	1	|	main	|	小白进入餐厅
+2023-01-15 21:40:46.515	|	1	|	main	|	小白点了 番茄炒蛋 + 一碗米饭
+2023-01-15 21:40:46.558	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师炒菜
+2023-01-15 21:40:46.558	|	21	|	ForkJoinPool.commonPool-worker-2	|	服务员蒸饭
+2023-01-15 21:40:46.558	|	1	|	main	|	小白在打王者
+2023-01-15 21:40:46.869	|	21	|	ForkJoinPool.commonPool-worker-2	|	服务员打饭
+2023-01-15 21:40:46.979	|	1	|	main	|	番茄炒蛋 + 米饭 好了 ,小白开吃
 ```
 
-### 补充：thenAcceptBoth/runAfterBoth
+{% endspoiler %}
 
-thenAcceptBoth/runAfterBoth 与 thenCombine相比的区别？
+### thenAcceptBoth/runAfterBoth
+
+**thenAcceptBoth/runAfterBoth 与 thenCombine相比的区别？**
 
 - thenCombine：需要前边任务的结果，有返回值；
 
@@ -334,12 +363,12 @@ thenAcceptBoth/runAfterBoth 与 thenCombine相比的区别？
 
 ## 4.4、thenApply/thenApplyAsync
 
-将前面异步任务的结果交给后面的 Function，不会处理异常，异常会被直接抛出，交给上一层处理。 
+**thenApply：**<font color='#0000ff' style="font-weight:bold;">将前面异步任务的结果交给后面的 Function，不会处理异常，异常会被直接抛出，交给上一层处理。 </font>
 
 - thenApply 使用同一线程运行前后两个任务；
 - thenApplyAsync 使用不同的线程运行前后两个任务，类似之前的 thenCompose。
 
-<font size=4 style="font-weight:bold;background:yellow;">Demo</font>
+<font size=4 style="font-weight:bold;background:yellow;">demo</font>
 
 {% spoiler 展开查看折叠代码 %}
 
@@ -396,19 +425,19 @@ public class _04_thenApply {
 
 {% endspoiler %}
 
-<font size=4 style="font-weight:bold;background:yellow;">运行结果</font>
+<font size=4 style="font-weight:bold;background:yellow;">res</font>
 
 **thenApply：**会在相同的线程中执行
 
 {% spoiler 展开查看折叠代码 %}
 
 ```java
-1663575607285	|	1	|	main	|	小白吃好了
-1663575607285	|	1	|	main	|	小白 结账、要求开发票
-1663575607325	|	20	|	pool-2-thread-1	|	服务员收款 500元
-1663575607325	|	1	|	main	|	小白 接到朋友的电话，想一起打游戏
-1663575607432	|	20	|	pool-2-thread-1	|	服务员开发票 面额 500元
-1663575607637	|	1	|	main	|	小白拿到500元发票，准备回家
+2023-01-15 21:46:42.436	|	1	|	main	|	小白吃好了
+2023-01-15 21:46:42.437	|	1	|	main	|	小白 结账、要求开发票
+2023-01-15 21:46:42.476	|	20	|	pool-1-thread-1	|	服务员收款 500元
+2023-01-15 21:46:42.476	|	1	|	main	|	小白 接到朋友的电话，想一起打游戏
+2023-01-15 21:46:42.589	|	20	|	pool-1-thread-1	|	服务员开发票 面额 500元
+2023-01-15 21:46:42.796	|	1	|	main	|	小白拿到500元发票，准备回家
 ```
 
 {% endspoiler %}
@@ -418,19 +447,19 @@ public class _04_thenApply {
 {% spoiler 展开查看折叠代码 %}
 
 ```java
-1663575723397	|	1	|	main	|	小白吃好了
-1663575723397	|	1	|	main	|	小白 结账、要求开发票
-1663575723430	|	20	|	pool-2-thread-1	|	服务员收款 500元
-1663575723430	|	1	|	main	|	小白 接到朋友的电话，想一起打游戏
-1663575723530	|	21	|	pool-2-thread-2	|	服务员开发票 面额 500元
-1663575723735	|	1	|	main	|	小白拿到500元发票，准备回家
+2023-01-15 21:46:25.975	|	1	|	main	|	小白吃好了
+2023-01-15 21:46:25.976	|	1	|	main	|	小白 结账、要求开发票
+2023-01-15 21:46:26.014	|	20	|	pool-1-thread-1	|	服务员收款 500元
+2023-01-15 21:46:26.014	|	1	|	main	|	小白 接到朋友的电话，想一起打游戏
+2023-01-15 21:46:26.118	|	21	|	pool-1-thread-2	|	服务员开发票 面额 500元
+2023-01-15 21:46:26.322	|	1	|	main	|	小白拿到500元发票，准备回家
 ```
 
 {% endspoiler %}
 
-### 补充：thenAccept/thenRun
+### thenAccept/thenRun
 
-thenAccept/thenRun 与 thenApply 相比的区别？
+**thenAccept/thenRun 与 thenApply 相比的区别？**
 
 - thenApply 接收前边任务的参数，有返回值；
 
@@ -439,15 +468,19 @@ thenAccept/thenRun 与 thenApply 相比的区别？
 
 ## 4.5、applyToEither
 
-两个任务一起运行，谁先运行完返回谁，demo 中 800 路的线程运行时间更快一些，会提前完成。
+**applyToEither：**<font color='#0000ff' style="font-weight:bold;">两个任务一起运行，谁先运行完返回谁。</font>
+
+<font size=4 style="font-weight:bold;background:yellow;">demo</font>
+
+demo 中 800 路的线程运行时间更快一些，会提前完成。
+
+{% spoiler 展开查看折叠代码 %}
 
 ```java
-public class _05_applyToEither {
-
+    @Test
     public void applyToEitherTest() {
         SmallTool.printTimeAndThread("张三走出餐厅，来到公交站");
         SmallTool.printTimeAndThread("等待 700路 或者 800路 公交到来");
-
         CompletableFuture<String> bus = CompletableFuture.supplyAsync(() -> {
             SmallTool.printTimeAndThread("700路公交正在赶来");
             SmallTool.sleepMillis(900);
@@ -457,21 +490,27 @@ public class _05_applyToEither {
             SmallTool.sleepMillis(200);
             return "800路到了";
         }), firstComeBus -> firstComeBus);
-
         SmallTool.printTimeAndThread(String.format("%s,小白坐车回家", bus.join()));
     }
-}
 ```
 
-```
-1663575900479	|	1	|	main	|	张三走出餐厅，来到公交站
-1663575900479	|	1	|	main	|	等待 700路 或者 800路 公交到来
-1663575900518	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路公交正在赶来
-1663575900518	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路公交正在赶来
-1663575900724	|	1	|	main	|	800路到了,小白坐车回家
+{% endspoiler %}
+
+<font size=4 style="font-weight:bold;background:yellow;">res</font>
+
+{% spoiler 展开查看折叠代码 %}
+
+```java
+2023-01-15 21:51:11.519	|	1	|	main	|	张三走出餐厅，来到公交站
+2023-01-15 21:51:11.519	|	1	|	main	|	等待 700路 或者 800路 公交到来
+2023-01-15 21:51:11.555	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路公交正在赶来
+2023-01-15 21:51:11.555	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路公交正在赶来
+2023-01-15 21:51:11.756	|	1	|	main	|	800路到了,小白坐车回家
 ```
 
-### 补充：acceptEither/runAfterEither
+{% endspoiler %}
+
+### acceptEither/runAfterEither
 
 acceptEither/runAfterEither 和 applyToEither 的区别？
 
@@ -481,22 +520,23 @@ acceptEither/runAfterEither 和 applyToEither 的区别？
 
 ## 4.6、exceptionally
 
-在链式调用中如果出现异常，就会调用 exceptionally 块中的内容，exceptionally 不一定放在最后，放在前面也可以。
+**exceptionally：**<font color='#0000ff' style="font-weight:bold;">在链式调用中如果出现异常，就会调用 exceptionally 块中的内容。</font>
 
-<font size=4 style="font-weight:bold;background:yellow;">Demo</font>
+exceptionally 不一定放在最后，放在前面也可以。
+
+<font size=4 style="font-weight:bold;background:yellow;">demo</font>
 
 {% spoiler 展开查看折叠代码 %}
 
 ```java
-public class _06_exceptionally {
-
+    @Test
     public void testEnd() {
         SmallTool.printTimeAndThread("张三走出餐厅，来到公交站");
         SmallTool.printTimeAndThread("等待 700路 或者 800路 公交到来");
-
         CompletableFuture<String> bus = CompletableFuture.supplyAsync(() -> {
             SmallTool.printTimeAndThread("700路公交正在赶来");
-            SmallTool.sleepMillis(400);     // 调整时间，700路一定先到
+            // 调整时间，700路一定先到
+            SmallTool.sleepMillis(400);
             return "700路到了";
         }).applyToEither(CompletableFuture.supplyAsync(() -> {
             SmallTool.printTimeAndThread("800路公交正在赶来");
@@ -514,33 +554,34 @@ public class _06_exceptionally {
             SmallTool.printTimeAndThread("小白叫出租车");
             return "出租车 叫到了";
         });
-
         SmallTool.printTimeAndThread(String.format("%s,小白坐车回家", bus.join()));
     }
-
 
     /**
      * exceptionally也可以放在链式调用的中间进行判断
      */
+    @Test
     public void testMiddle() {
         SmallTool.printTimeAndThread("小白走出餐厅，来到公交站");
         SmallTool.printTimeAndThread("等待 700路 或者 800路 公交到来");
-
         CompletableFuture<String> bus = CompletableFuture.supplyAsync(() -> {
+            // 并行执行
             SmallTool.printTimeAndThread("700路公交正在赶来");
             SmallTool.sleepMillis(100);
             if ("700路公交".startsWith("700")) {
                 throw new RuntimeException("700路撞树了...");
             }
-            return "700路到了";    // 并行执行
+            return "700路到了";
         }).exceptionally(e -> {
+            // 该exceptionally只对上边的第一个supplyAsync进行处理
             SmallTool.printTimeAndThread(e.getMessage());
             SmallTool.printTimeAndThread("700路撞树了，小白骑共享单车回家");
-            return "小白骑共享单车";   // 该exceptionally只对上边的第一个supplyAsync进行处理
+            return "小白骑共享单车";
         }).applyToEither(CompletableFuture.supplyAsync(() -> {
+            // 并行执行
             SmallTool.printTimeAndThread("800路公交正在赶来");
             SmallTool.sleepMillis(1000);
-            return "800路到了";    // 并行执行
+            return "800路到了";
         }), firstComeBus -> {
             SmallTool.printTimeAndThread(firstComeBus);
             return firstComeBus;
@@ -553,10 +594,8 @@ public class _06_exceptionally {
             SmallTool.printTimeAndThread("小白叫出租车");
             return "出租车 叫到了";
         });
-
         SmallTool.printTimeAndThread(String.format("%s,小白回家", bus.join()));
     }
-}
 ```
 
 {% endspoiler %}
@@ -567,37 +606,56 @@ public class _06_exceptionally {
 
 在程序中，700 路会撞车，并且提前到，小白一定会上 700；
 
+{% spoiler 展开查看折叠代码 %}
+
+```java
+2023-01-15 21:54:16.872	|	1	|	main	|	张三走出餐厅，来到公交站
+2023-01-15 21:54:16.873	|	1	|	main	|	等待 700路 或者 800路 公交到来
+2023-01-15 21:54:16.919	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路公交正在赶来
+2023-01-15 21:54:16.919	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路公交正在赶来
+2023-01-15 21:54:17.324	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路到了
+2023-01-15 21:54:17.324	|	20	|	ForkJoinPool.commonPool-worker-9	|	java.lang.RuntimeException: 撞树了...
+2023-01-15 21:54:17.325	|	20	|	ForkJoinPool.commonPool-worker-9	|	小白叫出租车
+2023-01-15 21:54:17.325	|	1	|	main	|	出租车 叫到了,小白坐车回家
 ```
-1663578908771	|	1	|	main	|	张三走出餐厅，来到公交站
-1663578908771	|	1	|	main	|	等待 700路 或者 800路 公交到来
-1663578908811	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路公交正在赶来
-1663578908811	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路公交正在赶来
-1663578909212	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路到了
-1663578909213	|	20	|	ForkJoinPool.commonPool-worker-9	|	java.lang.RuntimeException: 撞树了...
-1663578909213	|	20	|	ForkJoinPool.commonPool-worker-9	|	小白叫出租车
-1663578909213	|	1	|	main	|	出租车 叫到了,小白坐车回家
-```
+
+{% endspoiler %}
 
 如果调整时间，让 800 提前到，小白就会上 800，就不会出现异常。
 
+{% spoiler 展开查看折叠代码 %}
+
+```java
+2023-01-15 21:55:09.471	|	1	|	main	|	张三走出餐厅，来到公交站
+2023-01-15 21:55:09.471	|	1	|	main	|	等待 700路 或者 800路 公交到来
+2023-01-15 21:55:09.525	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路公交正在赶来
+2023-01-15 21:55:09.525	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路公交正在赶来
+2023-01-15 21:55:09.732	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路到了
+2023-01-15 21:55:09.733	|	1	|	main	|	800路到了,小白坐车回家
 ```
-1658372081763	|	1	|	main	|	张三走出餐厅，来到公交站
-1658372081763	|	1	|	main	|	等待 700路 或者 800路 公交到来
-1658372081804	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路公交正在赶来
-1658372081804	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路公交正在赶来
-1658372082019	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路到了
-1658372082039	|	1	|	main	|	800路到了,小白坐车回家
-```
+
+{% endspoiler %}
 
 **testMiddle：**exceptionally 放在程序中间
 
-```java
+{% spoiler 展开查看折叠代码 %}
 
+```java
+2023-01-15 21:54:28.273	|	1	|	main	|	小白走出餐厅，来到公交站
+2023-01-15 21:54:28.274	|	1	|	main	|	等待 700路 或者 800路 公交到来
+2023-01-15 21:54:28.316	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路公交正在赶来
+2023-01-15 21:54:28.317	|	21	|	ForkJoinPool.commonPool-worker-2	|	800路公交正在赶来
+2023-01-15 21:54:28.418	|	20	|	ForkJoinPool.commonPool-worker-9	|	java.lang.RuntimeException: 700路撞树了...
+2023-01-15 21:54:28.419	|	20	|	ForkJoinPool.commonPool-worker-9	|	700路撞树了，小白骑共享单车回家
+2023-01-15 21:54:28.419	|	20	|	ForkJoinPool.commonPool-worker-9	|	小白骑共享单车
+2023-01-15 21:54:28.419	|	1	|	main	|	小白骑共享单车,小白回家
 ```
 
-### 补充：handle/whenComplete
+{% endspoiler %}
 
-handle/whenComplete 与 exceptionally 的区别？
+### handle/whenComplete
+
+**handle/whenComplete 与 exceptionally 的区别？**
 
 - handle：参数是 BiFunction
   - 如果前面的程序正常执行，那么会接收到正常执行的结果；
