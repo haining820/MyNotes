@@ -263,7 +263,7 @@ public <U> CompletableFuture<U> thenCompose(Function<? super T, ? extends Comple
 
 **参数：**
 
-- Function：函数式接口，传入T，返回 R。（详见[函数式接口](https://haining820.github.io/2022/10/04/mynotes/Java/functional-interface/)）
+- Function：函数式接口，传入T，返回 R；
 - CompletionStage：CompletableFuture 的父接口，使用 CompletableFuture 替代即可。
 
 <font size=4 style="font-weight:bold;background:yellow;">demo</font>
@@ -701,7 +701,7 @@ public class _07_complete {
             future.complete("test success");
         } catch (Exception e) {
             future.completeExceptionally(e);
-        }
+        }         
         System.out.println(future.get());
     }
 }
