@@ -24,20 +24,20 @@ ListenableFuture 是由 Google Guava工具包提供的 Future 扩展类，随后
 
 get 有两种类型的重载，继承自父接口 Future 中两种方法，详情可见 Future 接口相关内容。
 
-- get 无参数：获得异步执行结果，如果任务一直不返回会一直阻塞，一般不建议使用
+- 无参数 get：获得异步执行结果，如果任务一直不返回会一直阻塞，一般不建议使用；
 
 ```java
 public T get()
 ```
 
 ```java
-// 这种写法主线程会一直阻塞，因为这种方式创建的 future 从未完成，
-// 可以打个断点看看，状态一直是 not completed。
+// 这种写法主线程会一直阻塞，因为这种方式创建的future从未完成，
+// 可以打个断点看看，future的状态一直是not completed。
 CompletableFuture<Integer> future = new CompletableFuture<>();
 Integer integer = future.get();
 ```
 
-- get 有参数：获得异步执行结果，指定超时时间，超时抛出异常
+- 有参数 get：获得异步执行结果，指定超时时间，超时抛出异常；
 
 ```java
 public T get(long timeout, TimeUnit unit)
@@ -88,22 +88,22 @@ public T getNow(T valueIfAbsent)
     public void getNowTest() {
         CompletableFuture<Integer> cf1 = new CompletableFuture<>();
         // cf没有结果，打印 666
-        log.info("cf getNow res#={}", cf1.getNow(666));
+        log.info("cf getNow#res={}", cf1.getNow(666));
         CompletableFuture<Integer> cf2 = new CompletableFuture<>();
         cf2.complete(777);
         // cf有结果，直接输出结果，打印 777
-        log.info("cf get res#={}", cf2.getNow(666));
+        log.info("cf get#res={}", cf2.getNow(666));
     }
 
     @Test
     public void getNowTest2() {
         CompletableFuture<Integer> getNowCf = CompletableFuture.supplyAsync(() -> sleepMillis(1000));
         // sleepMillis操作需要等待，没有结果立即返回，打印 666
-        log.info("cf getNow res#={}", getNowCf.getNow(666));
+        log.info("cf getNow#res={}", getNowCf.getNow(666));
         CompletableFuture<Integer> getCf = CompletableFuture.supplyAsync(() -> sleepMillis(1000));
         try {
             // 等待sleepMillis结果完成，打印 1
-            log.info("cf get res#={}", getCf.get());
+            log.info("cf get#res={}", getCf.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -134,27 +134,27 @@ public T join()
 # 2、supplyAsync/runAsync
 
 > 在学习异步任务的编排前，首先准备打印当前时间和线程名的工具类：
->
-> ```java
-> public class SmallTool {
->     public static void sleepMillis(long millis) {
->         try {
->             Thread.sleep(millis);
->         } catch (InterruptedException e) {
->             e.printStackTrace();
->         }
->     }
->     public static void printTimeAndThread(String tag) {
->         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
->         String result = new StringJoiner("\t|\t")
->                 .add(sdf.format(new Date()))
->                 .add(String.valueOf(Thread.currentThread().getId()))
->                 .add(Thread.currentThread().getName())
->                 .add(tag).toString();
->         System.out.println(result);
->     }
-> }
-> ```
+
+```java
+public class SmallTool {
+    public static void sleepMillis(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void printTimeAndThread(String tag) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        String result = new StringJoiner("\t|\t")
+                .add(sdf.format(new Date()))
+                .add(String.valueOf(Thread.currentThread().getId()))
+                .add(Thread.currentThread().getName())
+                .add(tag).toString();
+        System.out.println(result);
+    }
+}
+```
 
 **功能：**<font color='#0000ff' style="font-weight:bold;">执行异步任务，可以初始化 cf。</font>
 
@@ -173,7 +173,7 @@ public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executo
 
 - 供应者 supplier，是一个函数式接口；（详见[函数式接口](https://haining820.github.io/2022/10/04/mynotes/Java/functional-interface/)）
 
-- supplyAsync 后括号中的 supplier 会去另一个线程中执行。
+- supplyAsync 后括号中的 supplier 会去另一个线程中执行；
 
 - Executor 参数可以手动指定线程池，否则默认使用 `ForkJoinPool.commonPool()` 系统级公共线程池
 
@@ -251,7 +251,7 @@ public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executo
 
 {% endspoiler %}
 
-## 4.2、thenCompose
+# 3、thenCompose
 
 **thenCompose：**<font color='#0000ff' style="font-weight:bold;">连接，在异步执行线程1的基础上再开一个新的线程，使用 thenCompose 会将之前线程的结果交给下一个的线程，前一个线程运行完了有结果后下一个线程才能触发。</font>
 
@@ -290,7 +290,7 @@ public class ThenComposeTest {
 }
 ```
 
-```
+```java
 1658369953335	|	1	|	main	|	小白进入餐厅
 1658369953336	|	1	|	main	|	小白点了 番茄炒蛋 + 一碗米饭
 1658369953390	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师炒菜
@@ -299,7 +299,7 @@ public class ThenComposeTest {
 1658369953722	|	1	|	main	|	番茄炒蛋 + 米饭 好了,小白开吃
 ```
 
-## 4.3、thenCombine
+# 4、thenCombine
 
 **thenCombine：**<font color='#0000ff' style="font-weight:bold;">合并，将任务1和任务2一起执行，然后将任务1和任务2的返回结果用作任务3的输入。</font>
 
@@ -339,7 +339,7 @@ demo 中 dish 和 rice 作为线程 3 的输入，只有等线程 1 和线程 2 
 
 {% spoiler 展开查看折叠代码 %}
 
-```
+```java
 2023-01-15 21:40:46.514	|	1	|	main	|	小白进入餐厅
 2023-01-15 21:40:46.515	|	1	|	main	|	小白点了 番茄炒蛋 + 一碗米饭
 2023-01-15 21:40:46.558	|	20	|	ForkJoinPool.commonPool-worker-9	|	厨师炒菜
@@ -361,7 +361,7 @@ demo 中 dish 和 rice 作为线程 3 的输入，只有等线程 1 和线程 2 
 
 - runAfterBoth：不需要前边任务的结果也不需要返回值。
 
-## 4.4、thenApply/thenApplyAsync
+# 5、thenApply/thenApplyAsync
 
 **thenApply：**<font color='#0000ff' style="font-weight:bold;">将前面异步任务的结果交给后面的 Function，不会处理异常，异常会被直接抛出，交给上一层处理。 </font>
 
@@ -466,7 +466,7 @@ public class _04_thenApply {
 - thenAccept 会接收前边任务的参数，但是没有返回值；
 - thenRun 不接收前边任务的参数，也没有返回值；
 
-## 4.5、applyToEither
+# 6、applyToEither
 
 **applyToEither：**<font color='#0000ff' style="font-weight:bold;">两个任务一起运行，谁先运行完返回谁。</font>
 
@@ -518,7 +518,7 @@ acceptEither/runAfterEither 和 applyToEither 的区别？
 - acceptEither：得到结果，没有返回值；
 - runAfterEither：不关心结果，也不关心返回值。
 
-## 4.6、exceptionally
+# 7、exceptionally
 
 **exceptionally：**<font color='#0000ff' style="font-weight:bold;">在链式调用中如果出现异常，就会调用 exceptionally 块中的内容。</font>
 
@@ -683,7 +683,7 @@ CompletableFuture<Integer> future2 = future.handle((list,error)-> {
 });
 ```
 
-## 4.7、complete/completeExceptionally
+# 8、complete/completeExceptionally
 
 complete：主动触发当前异步任务的完成。
 
@@ -707,7 +707,7 @@ public class _07_complete {
 }
 ```
 
-## 4.8、allOf/anyOf
+# 9、allOf/anyOf
 
 allOf：多个任务都执行完成后才会执行。
 
@@ -768,7 +768,7 @@ public class _08_allOfAnyOf {
 }
 ```
 
-# 5、规律
+# 10、规律
 
 <font size=4 style="font-weight:bold;background:yellow;">规律</font>
 
@@ -828,8 +828,6 @@ xxxAsync(arg,Executor)
 |                |      thenApply       |   thenAccept   |    thenRun     |
 |                |    applyToEither     |  acceptEither  | runAfterEither |
 |                | exceptionally/handle |  whenComplete  |                |
-
-
 
 # 6、CompletableFuture 与 ListenableFuture 之间的转换
 

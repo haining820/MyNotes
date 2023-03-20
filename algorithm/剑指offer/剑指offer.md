@@ -348,7 +348,7 @@ class Solution {
         while(cur != null) {
             list.add(cur.val);
             cur = cur.next;
-        }
+        } 
         int size = list.size();
         int[] res = new int[size];
         for(int i = size - 1;i >=0;i--) {
