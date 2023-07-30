@@ -58,11 +58,24 @@ tags: [tips,AutoHotKey]
     ; alt+4 深紫色
     !4::addFontColor("#924193") 
 	
-	; alt+q 三级标题
-	!q::addBackgroundColor()
+	; ctrl+q 三级标题
+	^q::addBackgroundColor()
 	
-	; alt+w 生成可折叠代码块
-	!w::addCodeBlock()
+	; alt+d 获取当前时间
+	!d::GetCurrentTimeStamp()
+	
+	::/head::---`ntitle: `ndate: `ntags: []`ntoc: true
+	
+	::/code::{{}% spoiler 展开查看折叠代码 %{}}`n/java`n{{}% endspoiler %{}}
+	::/cs::{{}% spoiler 展开查看折叠代码 %{}}
+	::/ce::{{}% endspoiler %{}}
+
+	::/java::``````java
+	::/sql::``````sql
+	::/bash::``````bash
+	
+	
+
 }
 
 ; 快捷增加字体颜色
@@ -91,18 +104,15 @@ addBackgroundColor(){
         SendInput {TEXT}</ 				; Typora中自动补全标签
     }
 }
-; 设置折叠代码块
-addCodeBlock(){
-    clipboard := "" 					; 清空剪切板
-    Send {ctrl down}c{ctrl up} 			; 复制
-    ; SendInput {Text} 					; 解决中文输入法问题
-    SendInput {TEXT}<details><summary><font color='blue' style="font-weight:bold;">展开查看折叠代码块</font></summary><pre><code>
-    SendInput {ctrl down}v{ctrl up}		; 粘贴
-	If(clipboard = ""){
-        SendInput {TEXT}</code></pre></details> 		; Typora在这不会自动补充
-    }else{
-        SendInput {TEXT}</</</ 				; Typora中自动补全标签
-    }
+; 获取当前的时间戳精确到秒
+GetCurrentTimeStamp(){
+    send %A_YYYY%-%A_MM%-%A_DD%%A_SPACE%
+	ClipTemp = %Clipboard%
+	FormatTime , Clipboard , , HH':'mm
+	Send ^v
+	Sleep 100
+	Clipboard = %ClipTemp%
+	Return
 }
 ```
 

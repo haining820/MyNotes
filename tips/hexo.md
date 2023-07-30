@@ -1,3 +1,10 @@
+---
+title: hexo
+date: 2023-07-30 16:55
+tags: [hexo]
+toc: true
+---
+
 https://www.jianshu.com/p/4f21e948953e
 
 ## 1、运行
