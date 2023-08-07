@@ -7,6 +7,16 @@ toc: true
 
 > https://blog.csdn.net/weixin_38569499/article/details/91456988
 
+# 0、命令速查
+
+修改 settings.xml 之后，无法加载包，使用该命令强制 Maven 重新加载配置文件并重新安装依赖项
+
+```
+mvn clean install -U
+```
+
+
+
 # 1、project
 
 project 是 pom 文件的根元素，project 下有 modelVersion、groupId、artifactId、version、packaging 等重要元素，使用 groupId、artifactId、version 三个元素定义一个项目。
